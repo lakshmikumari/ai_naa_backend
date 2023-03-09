@@ -22,7 +22,8 @@ def netRule_netAdvice_json(audit_info):
     output will be stored in netRule_netRule collection in DB
     """
     try:
-        netrule_data = DB.get_data('netRule_netAdvice')
+        #netrule_data = DB.get_data('netRule_netAdvice')
+        netrule_data=[]
         file_name = audit_info['fileName'].split('.')[0]
         jsonData = {}
         jsonDataList = []
