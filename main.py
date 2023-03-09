@@ -87,11 +87,13 @@ def memory_check():
                       "Free": round(free, 2)}
     return memory_details
 
-
+audit_list = [ { 'auditId' : '153875', 'fileName': '153875.zip', 'status' : 'InProgress',
+                 'statusInternal' : 'created', 'auditType': 'upload' ,
+                 'crPartyId' : '100', 'crPartyName': 'Test', 'location': 'US', 'cpyKey': '100'} ]
 if __name__ == "__main__":
     """ calling main function to process the audit zip file """
     logger.info('script started,memory: {}'.format(memory_check()))
-    audit_list = DB.audit_information()
+    ###audit_list = DB.audit_information()
     audit_id_list = [i['auditId'] for i in audit_list]
     logger.info('Number of audits: %s', len(audit_id_list))
     for audit_info in audit_list:
@@ -99,7 +101,8 @@ if __name__ == "__main__":
         file = audit_info['fileName']  # 12345.zip
         file_name = file.split('.')[0]
         audit_id = audit_info['auditId']
-        status = DB.status_check(audit_info['auditId'])
+        #status = DB.status_check(audit_info['auditId'])
+        status = 'created'
         logger.info('status checked')
         if status == 'created':
             try:
@@ -107,10 +110,10 @@ if __name__ == "__main__":
                 msg = ''
                 logger.info("Processing: %s, memory:%s", audit_info['auditId'], memory_check())
                 # update the audit information status as processing
-                DB.update_audit_information(audit_id, 'Processing', 'Processing', 0)
+                #DB.update_audit_information(audit_id, 'Processing', 'Processing', 0)
 
                 startTime_file = getTime("date")
-
+                '''
                 # download the zip file
                 if audit_info['auditType'] == 'upload':
                     file_download = DB.file_download(file, audit_id)
@@ -141,7 +144,7 @@ if __name__ == "__main__":
                     status_upload = 'Error'
                     msg = 'Internal server error'
                     continue
-
+                '''
                 # extract the zip file
                 try:
                     extractZip(file)
@@ -151,7 +154,7 @@ if __name__ == "__main__":
                     execution_time = str(endTime - startTime).split(".")[0]
                     logger.info("Exceution time of audit:%s,file:%s is %s", audit_info['auditId'], file,
                                 str(endTime - startTime).split(".")[0])
-                    DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
+                    #DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
                     status_upload = 'Error'
                     msg = 'Internal server error'
                     continue
@@ -169,7 +172,7 @@ if __name__ == "__main__":
                     execution_time = str(endTime - startTime).split(".")[0]
                     logger.info("Exceution time of audit:%s,file:%s is %s", audit_info['auditId'], file,
                                 str(endTime - startTime).split(".")[0])
-                    DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
+                    #DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
                     status_upload = 'Error'
                     msg = 'Internal server error'
                     continue
@@ -194,7 +197,7 @@ if __name__ == "__main__":
                     execution_time = str(endTime - startTime).split(".")[0]
                     logger.info("Exceution time of audit:%s,file:%s is %s", audit_info['auditId'], file,
                                 str(endTime - startTime).split(".")[0])
-                    DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
+                    #DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
                     status_upload = 'Error'
                     msg = 'Internal server error'
                     continue
@@ -220,14 +223,14 @@ if __name__ == "__main__":
 
                 logger.info('after net_rule:%s', format(memory_check()))
                 # insert all data to DB
-                DB.insert_json_data()
+                #DB.insert_json_data()
 
                 endTime = getTime("date")
                 execution_time = str(endTime - startTime).split(".")[0]
                 logger.info("Exceution of %s : %s ", file, execution_time)
 
                 # update the audit information status as processing
-                DB.update_audit_information(audit_id, 'Completed', 'Completed', execution_time)
+                #DB.update_audit_information(audit_id, 'Completed', 'Completed', execution_time)
                 status_upload = 'Completed'
                 msg = ''
 
@@ -235,11 +238,12 @@ if __name__ == "__main__":
                 # update the audit information status as processing
                 endTime = getTime("date")
                 execution_time = str(endTime - startTime).split(".")[0]
-                DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
+                #DB.update_audit_information(audit_id, 'Error', 'Error', execution_time)
                 status_upload = 'Error'
                 msg = 'Internal server error'
                 continue
             finally:
+                '''
                 file_name = audit_info['fileName'].split('.')[0]  # 12345.zip
                 logger.info("Cleaning up ...")
                 if os.path.exists(scriptPath + "/AuditReportViewer.htm"):
@@ -263,6 +267,7 @@ if __name__ == "__main__":
                 logger.info('------------Processing of auditId %s Completed------------', audit_info['auditId'])
                 sendMail(audit_info['userId'], audit_info['auditId'], audit_info['crPartyName'],
                          audit_info['fileName'], status_upload, msg)
+                '''
                 continue
         else:
             pass
